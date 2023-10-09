@@ -54,7 +54,7 @@ export default function Home() {
   return (
     <div className="h-screen">
       <div className="relative flex flex-col items-center justify-center overflow-hidden pt-36">
-        <div className="w-96 p-8 bg-cyan-100 rounded-md shadow-md lg:max-w-xl pt-20">
+        <div className="w-96 p-8 bg-slate-100 rounded-md shadow-md lg:max-w-xl pt-20">
           <h1 className="text-3xl font-bold text-center text-gray-900">
             Login
           </h1>
@@ -71,7 +71,11 @@ export default function Home() {
                 {...register("email", { required: true })}
                 className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
               />
-              {errors.email && <span>Field is a required</span>}
+              {errors.email && (
+                <div className="border-red-400 rounded bg-red-100 text-red-700 mt-2">
+                  <p>Field is a required</p>
+                </div>
+              )}
             </div>
             <div className="mb-2">
               <label
@@ -85,15 +89,19 @@ export default function Home() {
                 {...register("password", { required: true })}
                 className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
               />
-              {errors.password && <span>Field is a required</span>}
+              {errors.password && (
+                <div className="border-red-400 rounded bg-red-100 text-red-700 mt-2">
+                  <p>Field is a required</p>
+                </div>
+              )}
             </div>
             <div className="mt-12">
               <button
                 type="submit"
                 className="justify-center items-center flex bg-gray-900 w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform rounded-md hover:bg-gray-800 focus:outline-none focus:bg-gray-900 h-12"
-                //disabled={loading}
+                disabled={loading}
               >
-                {/* {loading ? (
+                {loading ? (
                   <div role="status">
                     <svg
                       aria-hidden="true"
@@ -110,13 +118,19 @@ export default function Home() {
                   </div>
                 ) : (
                   <div>Login</div>
-                )} */}
+                )}
               </button>
-              {error && <div className="mt-4">{error.message}</div>}
+              {error && (
+                <div role="alert" className="pt-6">
+                  <div className="justify-center items-center flex border-red-400 rounded bg-red-100 px-4 py-3 text-red-700 ">
+                    <p>{error.message}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
 
-          <p className="mt-4 text-sm text-center text-gray-700">
+          <p className="mt-6 text-sm text-center text-gray-700">
             Don't have an account?{" "}
             <Link
               href="/register"
