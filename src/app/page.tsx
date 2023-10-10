@@ -53,46 +53,42 @@ export default function Home() {
       <div className="mx-auto  px-4 py-16 sm:px-8 sm:py-24 lg:max-w-7xl lg:px-8">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3 lg:gap-7 pt-20 sm:mb-98">
           <div
-            className="max-w-sm rounded overflow-hidden shadow-lg bg-slate-100 xl:aspect-h-6 xl:aspect-w-2  "
+            className="rounded-lg bg-slate-100 xl:aspect-h-8 xl:aspect-w-2 h-84 hover:bg-cyan-50 "
             onClick={() => setShowModalLineProduct(true)}
           >
             <img
-              className="h-auto max-w-full  "
+              className="w-full"
               src="https://tecdn.b-cdn.net/img/new/standard/city/041.jpg"
               alt="Sunset in the mountains"
             ></img>
             <div className="px-6 py-4">
-              <div className="font-bold text-xl mb-2">Hamburguesa Clásica</div>
+              <div className="font-bold text-xl mb-2">The Coldest Sunset</div>
             </div>
           </div>
           <div
-            className="max-w-sm rounded overflow-hidden shadow-lg bg-slate-100 xl:aspect-h-6 xl:aspect-w-2  "
+            className="rounded-lg bg-slate-100 xl:aspect-h-8 xl:aspect-w-2 h-84 hover:bg-cyan-50 "
             onClick={() => setShowModalLineProduct(true)}
           >
             <img
-              className="h-auto max-w-full  "
+              className="w-full"
               src="https://tecdn.b-cdn.net/img/new/standard/city/041.jpg"
               alt="Sunset in the mountains"
             ></img>
             <div className="px-6 py-4">
-              <div className="font-bold text-xl mb-2">
-                Hamburguesa Con Champiñones
-              </div>
+              <div className="font-bold text-xl mb-2">The Coldest Sunset</div>
             </div>
           </div>
           <div
-            className="max-w-sm rounded overflow-hidden shadow-lg bg-slate-100 xl:aspect-h-6 xl:aspect-w-2  "
+            className="rounded-lg bg-slate-100 xl:aspect-h-8 xl:aspect-w-2 h-84 hover:bg-cyan-50 "
             onClick={() => setShowModalLineProduct(true)}
           >
             <img
-              className="h-auto max-w-full  "
+              className="w-full"
               src="https://tecdn.b-cdn.net/img/new/standard/city/041.jpg"
               alt="Sunset in the mountains"
             ></img>
             <div className="px-6 py-4">
-              <div className="font-bold text-xl mb-2">
-                Hamburguesa Cheddar Doble
-              </div>
+              <div className="font-bold text-xl mb-2">The Coldest Sunset</div>
             </div>
           </div>
         </div>
