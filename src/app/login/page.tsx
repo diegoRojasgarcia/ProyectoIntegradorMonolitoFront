@@ -3,6 +3,7 @@
 import { gql, useMutation } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Auth } from "@/types";
 
 const LOGIN_USER = gql`
   mutation login($input: LoginUserInput!) {
@@ -16,11 +17,6 @@ const LOGIN_USER = gql`
 `;
 
 import { useForm } from "react-hook-form";
-
-export interface Auth {
-  email: string;
-  password: string;
-}
 
 export default function Home() {
   const {

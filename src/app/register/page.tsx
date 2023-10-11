@@ -3,6 +3,8 @@
 import { gql, useMutation } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Auth } from "@/types";
+import { useForm } from "react-hook-form";
 
 const REGISTER_USER = gql`
   mutation register($input: RegisterUserInput!) {
@@ -14,13 +16,6 @@ const REGISTER_USER = gql`
     }
   }
 `;
-
-import { useForm } from "react-hook-form";
-
-export interface Auth {
-  email: string;
-  password: string;
-}
 
 export default function Home() {
   const {
