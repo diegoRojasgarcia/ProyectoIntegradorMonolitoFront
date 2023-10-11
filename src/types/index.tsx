@@ -6,3 +6,10 @@ export interface Auth {
 export interface CreateLineProduct {
   cantidad: number;
 }
+
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+}

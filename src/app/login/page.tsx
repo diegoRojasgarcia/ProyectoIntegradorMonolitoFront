@@ -33,9 +33,6 @@ export default function Home() {
       email: dataform.email,
       password: dataform.password,
     };
-
-    console.log(LoginUserInput);
-
     await login({
       variables: {
         input: LoginUserInput,
