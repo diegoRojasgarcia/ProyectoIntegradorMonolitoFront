@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { CreateLineProduct } from "@/types";
 import React from "react";
 import { useForm } from "react-hook-form";

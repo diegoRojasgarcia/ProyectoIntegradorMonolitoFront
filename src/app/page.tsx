@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";

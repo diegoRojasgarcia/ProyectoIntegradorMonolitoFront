@@ -1,141 +1,121 @@
 "use client";
 
 import { gql, useMutation } from "@apollo/client";
+import React, { FC, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import router, { useRouter } from "next/router";
 import { Auth } from "@/types";
 import { useForm } from "react-hook-form";
-
-const REGISTER_USER = gql`
-  mutation register($input: RegisterUserInput!) {
-    register(registerUserInput: $input) {
-      user {
-        email
-      }
-      access_token
-    }
-  }
-`;
 
 export default function Home() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Auth>();
-  const [registerUser, { data, loading, error }] = useMutation(REGISTER_USER);
+  } = useForm<RegisterFormData>();
 
-  const router = useRouter();
+  
+  const CREATE_USER = gql`
+  mutation register($input: RegisterUserInput!) {
+    register(registerUserInput: $input) {
+      user {
+        email
+      }
+      access_token
+  }
+  }
+  `;
 
-  const onSubmit = handleSubmit(async (dataform) => {
-    const RegisterUserInput = {
-      email: dataform.email,
-      password: dataform.password,
-    };
+  const [createUser] = useMutation(CREATE_USER);
+    type RegisterFormData = Auth & {
+      confirm_password: string;
+  };
+  
+  const onSubmit = async (dataform: RegisterFormData) => {
+      if (dataform.password !== dataform.confirm_password) {
+          console.error("Passwords do not match");
+          return;
+      }
+  
+      const userInput = {
+          email: dataform.email,
+          password: dataform.password,
+          fullname: dataform.fullname,
+      };
+      console.log(userInput);
 
-    console.log(RegisterUserInput);
-
-    await registerUser({
-      variables: {
-        input: RegisterUserInput,
-      },
-    })
-      .then(() => {
+      try {
+        const response = await createUser({ variables: { input: userInput } });
+        console.log(response); 
         router.push("/index");
-      })
-      .catch(() => {});
-  });
+      } catch (err) {
+        console.error("Error creating user:", err);
+      }
+    };
+  
 
-  return (
-    <div className="h-screen bg-[url('../../public/images/loginbackground2.jpg')] bg-cover bg-center bg-no-repeat">
-      <div className="relative flex flex-col items-center justify-center overflow-hidden pt-36">
-        <div className="w-80 p-8 bg-slate-100 rounded-md shadow-2xl ">
-          <h1 className="text-3xl font-bold text-center text-gray-900">
-            Register
-          </h1>
-          <form onSubmit={onSubmit} className="mt-6">
-            <div className="mb-4">
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold text-gray-900"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                {...register("email", { required: true })}
-                className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
-              />
-              {errors.email && (
-                <div className="border-red-200 border rounded bg-red-100 text-red-700 mt-2">
-                  <p>Field is a required</p>
-                </div>
-              )}
-            </div>
-            <div className="mb-2">
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold text-gray-900"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                {...register("password", { required: true })}
-                className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
-              />
-              {errors.password && (
-                <div className="border-red-200 border rounded bg-red-100 text-red-700 mt-2">
-                  <p>Field is a required</p>
-                </div>
-              )}
-            </div>
-            <div className="mt-12">
-              <button
-                type="submit"
-                className="justify-center items-center flex bg-gray-900 w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform rounded-md hover:bg-gray-800 focus:outline-none focus:bg-gray-900 h-12"
-                disabled={loading}
-              >
-                {loading ? (
-                  <div role="status">
-                    <svg
-                      aria-hidden="true"
-                      className="w-8 h-8 mr-2 text-gray-100 animate-spin dark:text-gray-100 fill-gray-600 dark:fill-gray-100"
-                      viewBox="0 0 100 101"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                        fill="currentFill"
-                      />
-                    </svg>
-                  </div>
-                ) : (
-                  <div>Register</div>
-                )}
-              </button>
-              {error && (
-                <div role="alert" className="pt-6">
-                  <div className="justify-center items-center flex border-red-400 rounded bg-red-100 px-4 py-3 text-red-700 ">
-                    <p>{error.message}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </form>
-
-          <p className="mt-6 text-sm text-center text-gray-700">
-            Don't have an account?{" "}
-            <Link
-              href="/login"
-              className="font-medium text-blue-600 hover:underline"
-            >
-              Signup
-            </Link>
-          </p>
-        </div>
+    return (
+      <div className="bg-gray-100 flex h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-md space-y-8">
+              <div className="bg-white shadow-md rounded-md p-6">
+                  <img className="mx-auto h-12 w-auto" src="https://www.svgrepo.com/show/499664/user-happy.svg" alt="" />
+                  <h2 className="my-3 text-center text-3xl font-bold tracking-tight text-gray-900">
+                      Sign up for an account
+                  </h2>
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" method="POST">
+                      <div>
+                          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+                          <div className="mt-1">
+                              <input 
+                                  {...register('fullname', { required: true })}
+                                  type="text" 
+                                  className="px-2 py-3 mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm" 
+                              />
+                          </div>
+                      </div>
+  
+                      <div>
+                          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                          <div className="mt-1">
+                              <input 
+                                  {...register('email', { required: true })}
+                                  type="email" 
+                                  className="px-2 py-3 mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm" 
+                              />
+                          </div>
+                      </div>
+  
+                      <div>
+                          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                          <div className="mt-1">
+                              <input 
+                                  {...register('password', { required: true })}
+                                  type="password" 
+                                  className="px-2 py-3 mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm" 
+                              />
+                          </div>
+                      </div>
+  
+                      <div>
+                          <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                          <div className="mt-1">
+                              <input 
+                                  {...register('confirm_password', { required: true })}
+                                  type="password" 
+                                  className="px-2 py-3 mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm" 
+                              />
+                          </div>
+                      </div>
+  
+                      <div>
+                          <button type="submit"
+                              className="flex w-full justify-center rounded-md border border-transparent bg-sky-400 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-opacity-75 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2">
+                              Register Account
+                          </button>
+                      </div>
+                  </form>
+              </div>
+          </div>
       </div>
-    </div>
   );
 }
