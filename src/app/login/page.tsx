@@ -111,7 +111,7 @@ export default function Home() {
                     </svg>
                   </div>
                 ) : (
-                  <div>Login</div>
+                  <div>Ingresar</div>
                 )}
               </button>
               {error && (

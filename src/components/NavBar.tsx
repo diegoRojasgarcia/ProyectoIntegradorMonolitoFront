@@ -1,94 +1,96 @@
-import React from "react";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import ShoppingCarts from './ShoppingCarts';
+import Logo from '.../public/images/logohamburguesa.png'
+import { Menu, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
 
-export default function Navbar({ fixed }: any) {
-  const [navbarOpen, setNavbarOpen] = React.useState(false);
+
+function classNames(...classes: any[]) {
+    return classes.filter(Boolean).join(' ');
+  }
+  
+const LogoSVG: React.FC = () => (
+  <img src="/images/logohamburguesa.png" alt="Logo" className="w-12 h-12" />
+);
+
+const BurgerSVG: React.FC = () => (
+  <svg viewBox="0 0 20 20" fill="currentColor" className="w-6 h-6">
+      <path fillRule="evenodd" d="M2 5a1 1 0 011-1h16a1 1 0 110 2H3a1 1 0 01-1-1zM2 10a1 1 0 011-1h16a1 1 0 110 2H3a1 1 0 01-1-1zM3 15a1 1 0 100 2h16a1 1 0 100-2H3z" clipRule="evenodd" />
+  </svg>
+);
+
+const Navbar: React.FC = () => {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const toggleMenu = () => {
+      setIsOpen(!isOpen);
+  };
+
   return (
-    <>
-      {/* <nav className="fixed flex w-full flex-wrap items-center justify-between bg-gray-800 shadow py-2 text-neutral-500 shadow-lg hover:text-neutral-700 focus:text-neutral-700 dark:bg-neutral-600 lg:py-4">
-        <div className="flex w-full flex-wrap items-center justify-end px-3">
-          <div className="relative flex items-center">
-            <a
-              className="ml-1 text-neutral-500 transition duration-200 hover:text-neutral-700 hover:ease-in-out focus:text-neutral-700 disabled:text-black/30 motion-reduce:transition-none dark:text-neutral-200 dark:hover:text-neutral-300 dark:focus:text-neutral-300 [&.active]:text-black/90 dark:[&.active]:text-neutral-400 "
-              href="#"
-            >
-              <span className="[&>svg]:w-5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="h-5 w-5"
-                >
-                  <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                </svg>
-              </span>
-            </a>
-            <span className="ml-3 rounded-md bg-danger px-[0.85em] py-[0.6em] text-[0.6rem] font-bold leading-none text-white">
-              1
-            </span>
-          </div>
-        </div>
-        <div className="mx-auto lg:max-w-7xl bg-gray-200">
-          <div className="relative flex items-center lg:max-w-7xl">hola</div>
-        </div>
-      </nav> */}
-      <nav className="bg-gray-800 text-white">
-        <div className="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a href="#" className="flex items-center">
-            <span className="self-center text-2xl font-semibold whitespace-nowrap">
-              <h1>Burgir</h1>
-            </span>
-          </a>
-          <button
-            data-collapse-toggle="navbar-default"
-            type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-            aria-controls="navbar-default"
-            aria-expanded="false"
-          >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              className="w-5 h-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 17 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 1h15M1 7h15M1 13h15"
-              />
-            </svg>
-          </button>
-          <div
-            className="hidden w-full md:block md:w-auto"
-            id="navbar-default "
-          >
-            <div className="relative flex items-center">
-              <a
-                className="ml-1 text-neutral-500 transition duration-200 hover:text-neutral-700 hover:ease-in-out focus:text-neutral-700 disabled:text-black/30 motion-reduce:transition-none dark:text-neutral-200 dark:hover:text-neutral-300 dark:focus:text-neutral-300 [&.active]:text-black/90 dark:[&.active]:text-neutral-400 "
-                href="#"
-              >
-                <span className="[&>svg]:w-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                  </svg>
-                </span>
-              </a>
-              <span className="ml-3 rounded-md bg-danger px-[0.85em] py-[0.6em] text-[0.6rem] font-bold leading-none text-white">
-                1
-              </span>
+    <div className="bg-blue-500">
+        <nav className="relative px-4 py-4 flex justify-between items-center bg-white">
+            <Link href="/" passHref>
+              <div className="cursor-pointer text-3xl font-bold leading-none">
+                <LogoSVG />
+              </div>
+            </Link>
+            <div className="lg:hidden">
+            <button onClick={toggleMenu} className="flex items-center p-2 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
+              <BurgerSVG />
+            </button>
             </div>
-          </div>
-        </div>
-      </nav>
-    </>
+            {/* <ul className={`transform transition-transform duration-200 lg:flex lg:mx-auto lg:items-center lg:w-auto lg:space-x-6 ${isOpen ? 'absolute top-full right-0 w-50 bg-white block py-2 z-50' : 'hidden'}`}> */}
+            <ul className={`transform transition-transform duration-200 lg:flex lg:mx-auto lg:items-center lg:w-auto lg:space-x-6 ${isOpen ? 'absolute top-full right-0 w-72 bg-white block py-2 z-50' : 'hidden'}`}>
+            <li className="lg:py-0 py-2 border-b border-gray-200">
+                <Link href="/" passHref>
+                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Home</div>
+                </Link>
+            </li>
+            <li className="lg:py-0 py-2 border-b border-gray-200">
+                <Link href="/about-us" passHref>
+                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">About Us</div>
+                </Link>
+            </li>
+            <li className="lg:py-0 py-2 border-b border-gray-200">
+                <Link href="/services" passHref>
+                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Services</div>
+                </Link>
+            </li>
+            <li className="lg:py-0 py-2 border-b border-gray-200">
+                <Link href="/pricing" passHref>
+                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Pricing</div>
+                </Link>
+            </li>
+            <li className="lg:py-0 py-2 border-b border-gray-200">
+                <Link href="/contact" passHref>
+                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Contact</div>
+                </Link>
+            </li>
+            </ul>
+
+  
+            <div className="flex hidden lg:flex items-center space-x-4">
+            <li className="flex hidden lg:flex items-center space-x-4">
+                <Link href="/login" passHref>
+                    <div className="ml-auto mr-3 py-2 px-6 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-bold rounded-xl transition duration-200">Sign In</div>
+                </Link>   
+            </li>  
+            <li className="flex hidden lg:flex items-center space-x-4">
+                <Link href="/register" passHref>
+                    <div className="py-2 px-6 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200">Sign up</div> 
+                </Link>
+            </li>
+             </div>
+
+
+        </nav>
+        {isOpen && 
+            <div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25 z-40" onClick={toggleMenu}></div>
+        }
+    </div>
   );
 }
+
+export default Navbar;

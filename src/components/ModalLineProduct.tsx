@@ -1,25 +1,38 @@
-/* eslint-disable @next/next/no-img-element */
-import { CreateLineProduct } from "@/types";
-import React from "react";
-import { useForm } from "react-hook-form";
 
-function ModalLineProduct({ closeModalCreate, crearLineProduct }: any) {
+import { CreateLineProduct } from "@/types";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import ShoppingCart, { addToCart } from './ShoppingCarts';
+
+export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }: any) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<CreateLineProduct>();
+  const [message, setMessage] = useState('');
+  console.log(product)
+  
+  const onSubmit = handleSubmit((data) => {
+    const productToAdd = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: parseInt(data.cantidad as unknown as string)
+    };
+    addToCart(productToAdd);  
+    setMessage('Producto agregado al carrito!'); 
 
-  const onSubmit = handleSubmit(async (data) => {
     crearLineProduct(data);
+    console.log(data);
+    closeModalCreate(false);
   });
-
   return (
     <>
       <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-        <div className="relative w-auto my-6 mx-auto max-w-sm">
-          <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-            <div className="flex items-start justify-center p-5 border-b border-solid border-slate-200 rounded-t">
+        <div className="relative w-auto my-5 mx-auto max-w-sm">
+          <div className="border-2 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+            <div className="flex items-start justify-center p-5 border-b border-solid border-slate-100 rounded-t">
               <img
                 className="h-auto max-w-full rounded-lg "
                 src="https://tecdn.b-cdn.net/img/new/standard/city/041.jpg"
@@ -27,25 +40,29 @@ function ModalLineProduct({ closeModalCreate, crearLineProduct }: any) {
               ></img>
             </div>
             <div className="px-6 py-4">
-              <div className="font-bold text-xl mb-2">Hamburguesa Clásica</div>
-              <p className="text-gray-700 text-base">
-                Una jugosa hamburguesa de carne de res con lechuga, tomate,
-                cebolla y salsa especial.
-              </p>
-            </div>
-            <div className="relative p-6 flex-auto">
-              <form onSubmit={onSubmit}>
-                <div className="mb-4">
-                  <label className="block text-sm font-semibold text-gray-900">
-                    Cantidad
-                  </label>
-                  <input
-                    type="number"
-                    {...register("cantidad", { required: true })}
-                    className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                  />
-                  {errors.cantidad && <span>Field is a required</span>}
+                  <div className="font-bold text-xl mb-2">{product.name}</div>
+                  <div className="text-sm mb-2 text-gray-600">{product.description}</div>
+                  <div className="font-medium text-sm text-gray-700">${product.price}</div>
                 </div>
+            <div className="px-0 py-0">
+            </div>
+            <div className="relative p-2 flex-auto">
+            {message && <div className="mb-4 text-green-500">{message}</div>}
+              <form onSubmit={onSubmit}>
+              <div className="mb-4">
+              <label className="block text-sm font-semibold text-gray-500">
+                  Cantidad
+              </label>
+              <input
+                  type="number"
+                  {...register("cantidad", { 
+                      required: true, 
+                      validate: value => parseInt(value.toString(), 10) > 0 || "Cantidad debe ser mayor que 0" 
+                  })}
+                  className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              />
+              {errors.cantidad && <span>{errors.cantidad.message || "Field is a required"}</span>}
+              </div>
 
                 {/*footer*/}
                 <div className="flex items-center justify-end  border-t border-solid border-slate-200 rounded-b mt-6">
@@ -73,4 +90,4 @@ function ModalLineProduct({ closeModalCreate, crearLineProduct }: any) {
   );
 }
 
-export default ModalLineProduct;
+
