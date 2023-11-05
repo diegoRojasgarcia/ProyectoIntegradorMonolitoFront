@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import ShoppingCarts from './ShoppingCarts';
-import Logo from '.../public/images/logohamburguesa.png'
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 
@@ -49,23 +48,18 @@ const Navbar: React.FC = () => {
                 </Link>
             </li>
             <li className="lg:py-0 py-2 border-b border-gray-200">
-                <Link href="/about-us" passHref>
+                <Link href="/burgers" passHref>
+                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Burgers</div>
+                </Link>
+            </li>
+            <li className="lg:py-0 py-2 border-b border-gray-200">
+                <Link href="/drinks" passHref>
+                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Drinks</div>
+                </Link>
+            </li>
+            <li className="lg:py-0 py-2 border-b border-gray-200">
+                <Link href="/aboutUs" passHref>
                     <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">About Us</div>
-                </Link>
-            </li>
-            <li className="lg:py-0 py-2 border-b border-gray-200">
-                <Link href="/services" passHref>
-                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Services</div>
-                </Link>
-            </li>
-            <li className="lg:py-0 py-2 border-b border-gray-200">
-                <Link href="/pricing" passHref>
-                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Pricing</div>
-                </Link>
-            </li>
-            <li className="lg:py-0 py-2 border-b border-gray-200">
-                <Link href="/contact" passHref>
-                    <div className="cursor-pointer block w-full text-center px-4 py-2 hover:bg-gray-100">Contact</div>
                 </Link>
             </li>
             </ul>

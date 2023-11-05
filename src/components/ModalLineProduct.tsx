@@ -33,11 +33,11 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
         <div className="relative w-auto my-5 mx-auto max-w-sm">
           <div className="border-2 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
             <div className="flex items-start justify-center p-5 border-b border-solid border-slate-100 rounded-t">
-              <img
-                className="h-auto max-w-full rounded-lg "
-                src="https://tecdn.b-cdn.net/img/new/standard/city/041.jpg"
+            <img
+                className="w-full"
+                src={product.image}
                 alt="Sunset in the mountains"
-              ></img>
+              />
             </div>
             <div className="px-6 py-4">
                   <div className="font-bold text-xl mb-2">{product.name}</div>

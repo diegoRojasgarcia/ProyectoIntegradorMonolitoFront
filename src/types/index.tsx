@@ -9,6 +9,7 @@ export interface CreateLineProduct {
 }
 
 export interface Product {
+  image: string | undefined;
   id: number;
   name: string;
   description: string;

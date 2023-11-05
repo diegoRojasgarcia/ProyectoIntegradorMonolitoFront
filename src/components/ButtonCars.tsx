@@ -38,7 +38,7 @@ interface ShoppingCartModalProps {
 
 const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({ onClose }) => {
     return (
-        <div className="fixed top- left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white rounded p-4 w-1/2">
                 <ShoppingCarts />
 
