@@ -88,7 +88,6 @@ return (
                 <img
                   className="absolute top-0 left-0 w-full h-full object-cover"
                   src={product.image}
-                  alt={product.name}
                 />
               </div>
               <div className="px-6 py-4">

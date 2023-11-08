@@ -52,7 +52,7 @@ export default function Home() {
   return (
     <div className="h-screen bg-[url('../../public/images/loginbackground2.jpg')] bg-cover bg-center bg-no-repeat">
       <div className="relative flex flex-col items-center justify-center overflow-hidden pt-6">
-        <div className="w-50 p-8 bg-slate-100 rounded-md shadow-2xl">
+          <div className="w-50 p-8 bg-slate-100 rounded-md shadow-2xl">
           <h2 className="my-3 text-center text-3xl font-bold tracking-tight text-gray-900">
             Sign up for an account
           </h2>

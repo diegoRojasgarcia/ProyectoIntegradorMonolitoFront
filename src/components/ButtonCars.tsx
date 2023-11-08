@@ -15,7 +15,7 @@ const ButtonCars: React.FC = () => {
 
     return (
         <div className="rounded-fullr">
-          <button onClick={handleOpenModal} className="bg-gray-800 text-white rounded-full p-4 hover:bg-gray-700 transition duration-300 shadow-lg">
+          <button onClick={handleOpenModal} className="bg-gray-800 text-white rounded-full p-4 hover:bg-gray-700 transition duration-300 shadow-lg fixed bottom-4 right-4">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"          
@@ -45,6 +45,7 @@ const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({ onClose }) => {
                 <button onClick={onClose} className="mt-4 bg-black text-white p-2 rounded">
                     Cerrar Carrito
                 </button>
+                
             </div>
         </div>
     );

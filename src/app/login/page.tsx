@@ -5,11 +5,14 @@ import { gql, useMutation } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Auth } from "@/types";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LOGIN_USER = gql`
   mutation login($input: LoginUserInput!) {
     login(loginUserInput: $input) {
       user {
+        id
         email
       }
       access_token
@@ -25,8 +28,21 @@ export default function Home() {
     handleSubmit,
     formState: { errors },
   } = useForm<Auth>();
-  const [login, { data, loading, error }] = useMutation(LOGIN_USER);
 
+  const [login, { loading, error }] = useMutation(LOGIN_USER, {
+    onCompleted: (data) => {
+      if (data.login && data.login.user && data.login.user.email && data.login.user.id) {
+        // Almacenando el email y el id en localStorage
+        localStorage.setItem("emailUser", data.login.user.email);
+        localStorage.setItem("userId", data.login.user.id); // Guarda el ID del usuario
+        router.push("/");
+      }
+    },
+    onError: (err) => {
+      console.error("Login error:", err);
+    },
+  });
+  
   const router = useRouter();
 
   const onSubmit = handleSubmit(async (dataform) => {
@@ -34,15 +50,14 @@ export default function Home() {
       email: dataform.email,
       password: dataform.password,
     };
-    await login({
+    login({
       variables: {
-        input: LoginUserInput,
+        input: {
+          email: dataform.email,
+          password: dataform.password,
+        },
       },
-    })
-      .then(() => {
-        router.push("/");
-      })
-      .catch(() => {});
+    });
   });
 
   return (

@@ -1,11 +1,6 @@
+import { ProductInCart } from '@/types';
 import React, { useState, useEffect } from 'react';
 
-type ProductInCart = {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-};
 
 let cart: ProductInCart[] = [];
 
@@ -16,6 +11,10 @@ export function addToCart(product: ProductInCart) {
     } else {
         cart.push(product);
     }
+}
+
+function Cart() {
+    let [cartItems, setCartItems] = useState<ProductInCart[]>(cart);
 }
 
 export function getCart(): ProductInCart[] {
@@ -55,6 +54,17 @@ function ShoppingCart() {
     setProducts([]);
   }
 
+  const handleCheckoutClick = () => {
+    handleCheckout(products);
+    setProducts([]);
+  };
+
+  function handleCheckout(products: ProductInCart[]) {
+    console.log('Procesando la compra con los siguientes productos:', products);
+    clearCart();
+    setProducts(getCart());  
+}
+
   return (
     <div className="w-full max-w-3xl p-10 bg-white bg-opacity-90 rounded-lg shadow-md overflow-y-auto">
         <h2 className="text-2xl font-bold text-black mb-4">Carrito de compra</h2>
@@ -85,9 +95,13 @@ function ShoppingCart() {
                 </button>
             </div>
         )}
+        <button className="checkout-button" onClick={handleCheckoutClick}>
+                Proceder con la Venta
+            </button>
     </div>
   );
 }
 
 export default ShoppingCart;
+
 
