@@ -1,8 +1,24 @@
 
 import { CreateLineProduct } from "@/types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import ShoppingCart, { addToCart } from './ShoppingCarts';
+import { gql, useMutation } from "@apollo/client";
+
+
+const CREAR_LINEA_PRODUCTO = gql`
+  mutation crearLineaProducto($input: CreateLineaproductoInput!) {
+    createLineProduct(createLineaproductoInput: $input) {
+      id
+      product {
+        name
+        price
+      }
+      cant
+      subprice
+    }
+  }
+  `;
 
 export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }: any) {
   const {
@@ -12,7 +28,16 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
   } = useForm<CreateLineProduct>();
   const [message, setMessage] = useState('');
   console.log(product)
-  
+  const [crearLineaDeProducto, { data, loading, error }] = useMutation(CREAR_LINEA_PRODUCTO);
+  const [carritoIdStorage, setcarritodStorage] = React.useState('');
+  const [carritoId, setCarritoId] = useState<number | null>(null);
+  useEffect(() => {
+    const storedCartId = localStorage.getItem('cartId');
+    if (storedCartId) {
+      setCarritoId(parseInt(storedCartId));
+    }
+  }, []);
+
   const onSubmit = handleSubmit((data) => {
     const productToAdd = {
         id: product.id,
@@ -20,12 +45,33 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
         price: product.price,
         quantity: parseInt(data.cantidad as unknown as string)
     };
+    if (!carritoId) {
+      console.error('Falta el ID del carrito');
+      return;
+    }
     addToCart(productToAdd);  
     setMessage('Producto agregado al carrito!'); 
-
-    crearLineProduct(data);
-    console.log(data);
-    closeModalCreate(false);
+    try {
+      crearLineaDeProducto({
+        variables: {
+          input: {
+            idCarrito: carritoId,
+            idProduct: product.id,
+            cant: parseInt(data.cantidad as unknown as string)
+          }
+        }
+      }).then(response => {
+        // Handle response if needed
+        crearLineProduct(data);
+        closeModalCreate(false);
+      }).catch(error => {
+        console.error(error);
+        setMessage('Ocurrió un error al añadir el producto a la base de datos.');
+      });
+    } catch (e) {
+      console.error(e);
+      setMessage('Ocurrió un error al añadir el producto a la base de datos.');
+    }
   });
   return (
     <>
@@ -89,5 +135,3 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
     </>
   );
 }
-
-

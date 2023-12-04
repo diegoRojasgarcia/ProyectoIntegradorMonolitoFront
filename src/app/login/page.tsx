@@ -1,9 +1,12 @@
+
+
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation} from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { Auth } from "@/types";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -20,28 +23,77 @@ const LOGIN_USER = gql`
   }
 `;
 
-import { useForm } from "react-hook-form";
+const CREATE_CART = gql`
+mutation crearCarrito ($input: CreateCarritoInput!){
+  createCarrito(createCarritoInput: $input){
+    id,
+    dateCreate,
+    user{
+      id,
+      email,
+      fullname
+    }
+  }
+}
+`;
+
 
 export default function Home() {
+  const [createCarrito] = useMutation(CREATE_CART);
+  const [userId, setUserId] = React.useState(null);
+  const [carritoId, setCarritoId] = React.useState(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Auth>();
-
   const [login, { loading, error }] = useMutation(LOGIN_USER, {
-    onCompleted: (data) => {
-      if (data.login && data.login.user && data.login.user.email && data.login.user.id) {
-        // Almacenando el email y el id en localStorage
+    onCompleted: async (data) => {
+      console.log("Login completado:", data);
+  
+      if (data.login && data.login.user) {
         localStorage.setItem("emailUser", data.login.user.email);
-        localStorage.setItem("userId", data.login.user.id); // Guarda el ID del usuario
+        localStorage.setItem("userId", data.login.user.id); 
+        console.log("Datos del usuario guardados en localStorage");
+  
+        try {
+          console.log("Intentando crear carrito para el usuario:", data.login.user.id);
+          // Ejecutar la mutación para crear el carrito
+          const carritoResponse = await createCarrito({
+            variables: {
+              input: { idUser: data.login.user.id }
+            }
+          });
+          
+          // Almacenar el ID del carrito en el estado local y en el almacenamiento local
+          const carritoId = carritoResponse.data.createCarrito.id;
+          setCarritoId(carritoId);
+          localStorage.setItem('cartId', carritoId);
+
+          console.log("Respuesta de la creación del carrito:", carritoResponse);
+          // Si la creación del carrito es exitosa, proceder con la lógica post-creación
+          if (carritoResponse.data) {
+            localStorage.setItem('cartId', carritoResponse.data.createCarrito.id);
+            console.log("Carrito creado y guardado en localStorage, redirigiendo al usuario");
+  
+            // Redirigir al usuario a la página del carrito
+            router.push("/cart");
+          }
+        } catch (carritoError) {
+          // Manejar errores en la creación del carrito aquí
+          console.error("Error al crear el carrito:", carritoError);
+        }
+  
+        // Redirigir al usuario a la página de inicio (o donde sea adecuado)
         router.push("/");
       }
     },
     onError: (err) => {
-      console.error("Login error:", err);
+      console.error("Error de inicio de sesión:", err);
     },
   });
+  
+  
   
   const router = useRouter();
 
@@ -59,7 +111,7 @@ export default function Home() {
       },
     });
   });
-
+  
   return (
     <div className="h-screen bg-[url('../../public/images/loginbackground2.jpg')] bg-cover bg-center bg-no-repeat">
       <div className="relative flex flex-col items-center justify-center overflow-hidden pt-36">
@@ -153,3 +205,4 @@ export default function Home() {
     </div>
   );
 }
+

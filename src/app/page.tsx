@@ -1,7 +1,7 @@
 
 "use client";
 
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery,  InMemoryCache, makeVar  } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +10,8 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import ButtonCars from  "@/components/ButtonCars";
 import { ModalLineProduct } from "@/components/ModalLineProduct";
+
+export const cartItemsVar = makeVar([]);
 
 const Product_QUERY = gql`
   query {
@@ -25,6 +27,7 @@ const Product_QUERY = gql`
     }
   }
 `;
+
 
 export default function Home() {
   const {
@@ -57,7 +60,8 @@ export default function Home() {
     setProductSelected(product);
     setShowModalLineProduct(true);
     console.log(product);
-};
+  };
+ 
 
 useEffect(() => {
   if (data && data.products && data.products.length >= 3) {
