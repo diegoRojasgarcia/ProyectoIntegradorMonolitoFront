@@ -43,9 +43,10 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
         id: product.id,
         name: product.name,
         price: product.price,
-        quantity: parseInt(data.cantidad as unknown as string)
+        quantity: parseInt(data.cantidad as unknown as string),
+        image:product.image
     };
-    if (!carritoId) {
+     if (!carritoId) {
       console.error('Falta el ID del carrito');
       return;
     }
@@ -100,14 +101,18 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
                   Cantidad
               </label>
               <input
-                  type="number"
+                  type="number" min="1"
                   {...register("cantidad", { 
-                      required: true, 
-                      validate: value => parseInt(value.toString(), 10) > 0 || "Cantidad debe ser mayor que 0" 
+                      required: "La cantidad es requerida", 
+                      min: {
+                        value: 1,
+                        message: "Cantidad debe ser mayor que 0"
+                      }
                   })}
                   className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
               />
-              {errors.cantidad && <span>{errors.cantidad.message || "Field is a required"}</span>}
+              {errors.cantidad && <span className="text-red-500">{errors.cantidad.message}</span>}
+
               </div>
 
                 {/*footer*/}
