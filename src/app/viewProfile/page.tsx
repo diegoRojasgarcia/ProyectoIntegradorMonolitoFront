@@ -41,7 +41,7 @@ const ViewProfile = () => {
     skip: !loadUser,
   });
 
-  if (!data || !data.userById) return <p>No user found with id: {userId}</p>; // Updated line
+  if (!data || !data.userById) return <p>No user found with id: {userId}</p>;
   
   const user = data.userById;
   

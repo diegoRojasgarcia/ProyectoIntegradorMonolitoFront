@@ -13,14 +13,18 @@ type RegisterFormData = Auth & {
 };
 
 const CREATE_USER = gql`
-mutation register($input: RegisterUserInput!) {
-  register(registerUserInput: $input) {
-    user {
-      email
-    }
-    access_token
+mutation RegisterUser($name: String!, $email: String!, $password: String!) {
+  register(registerUserInput: {
+    name: $name,
+    email: $email,
+    password: $password
+  }) {
+    status
+    error
+    message
   }
 }
+
 `;
 export default function Home() {
   const router = useRouter();
@@ -38,7 +42,7 @@ export default function Home() {
     const userInput = {
       email: dataform.email,
       password: dataform.password,
-      fullname: dataform.fullname,
+      name: dataform.name,
     };
     try {
       const response = await createUser({ variables: { input: userInput } });
@@ -61,7 +65,7 @@ export default function Home() {
               <label htmlFor="username" className="block text-sm font-semibold text-gray-900">Username</label>
               <div className="mt-4">
                 <input
-                  {...register('fullname', { required: true })}
+                  {...register('name', { required: true })}
                   type="text"
                   className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
                 />

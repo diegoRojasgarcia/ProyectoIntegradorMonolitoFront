@@ -14,15 +14,16 @@ import { ModalLineProduct } from "@/components/ModalLineProduct";
 export const cartItemsVar = makeVar([]);
 
 const Product_QUERY = gql`
-  query {
-    products {
-      id
-      name
-      description
-      price
-      image
-      ingredients {
+  query GetProductos {
+    getProductos {
+      status
+      error
+      data {
+        id
         name
+        description
+        price
+        image
       }
     }
   }
