@@ -4,7 +4,7 @@ export interface Auth {
   password: string;
 }
 
-export interface CreateLineProduct {
+export interface CrearLineaProducto {
   cantidad: number;
 }
 
@@ -17,9 +17,12 @@ export interface Product {
   
 }
 export interface ProductInCart {
-  image: string | undefined;
+  cant: number;
+  producto: any;
   id: string;
   name: string;
   price: number;
   quantity: number;
+  image: string;
+  subprice: number;
 }

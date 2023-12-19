@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-ENV REACT_APP_GRAPHQL_URL=host.docker.internal:3000/graphql
+ENV REACT_APP_GRAPHQL_URL=host.docker.internal:8000/graphql
 
 RUN npm run
 

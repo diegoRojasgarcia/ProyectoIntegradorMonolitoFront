@@ -5,15 +5,16 @@ import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { CreateLineProduct, Auth, Product } from "@/types";
+import { CrearLineaProducto, Auth, Product } from "@/types";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import ButtonCars from  "@/components/ButtonCars";
 import { ModalLineProduct } from "@/components/ModalLineProduct";
 
 const Product_QUERY = gql`
-  query {
-    products {
+query {
+  getProductos {
+    data {
       id
       name
       description
@@ -24,6 +25,7 @@ const Product_QUERY = gql`
       }
     }
   }
+}
 `;
 
 export default function Home() {
@@ -38,7 +40,7 @@ export default function Home() {
   const router = useRouter();
   const [Burgers, setBurgers] = useState<Product[]>([]);
 
-  const crearLineProduct = async (dataLineProduct: CreateLineProduct) => {
+  const crearLineProduct = async (dataLineProduct: CrearLineaProducto) => {
     const cantidad = dataLineProduct.cantidad;
     console.log(
       "se ha creado la line product, cantidad del producto",
@@ -60,8 +62,8 @@ export default function Home() {
 };
 
 useEffect(() => {
-  if (data && data.products && data.products.length >= 3) {
-        setBurgers(data.products.slice(13, 22));
+  if (data && data.getProductos && data.getProductos.data && data.getProductos.data.length >= 3) {
+        setBurgers(data.getProductos.data.slice(13, 22));
   }
 }, [data]);
 

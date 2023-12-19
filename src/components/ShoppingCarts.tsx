@@ -20,16 +20,33 @@ export const DELETE_PRODUCT_LINE = gql`
     }
 `;
 
+export const VACIAL_CARROTO = gql`
+mutation vaciarCarrito($input: vaciarCarritoRequest!) {
+    vaciarCarrito(vaciarCarritoInput: $input) {
+      status
+      error
+      Empty
+    }
+  }
+`;
+
 export const GET_PRODUCTS_IN_CART = gql`
-  query GetLineProductsInCart($cartId: Int!) {
-    findAllLineProductsInCart(cartId: $cartId) {
-      id
-      product {
+  query LineaProductoByIdCarrito($input: getProductoByIdCarritoInput!) {
+    getLineaProductoByIdCarrito(getLineaProductoByIdCarritoInput: $input) {
+      status
+      error
+      lp {
         id
-        name
+        producto {
+          id
+          name
+          description
+          image
+        }
+        cant
+        subprice
+        idcarrito
       }
-      cant
-      subprice
     }
   }
 `;
@@ -66,8 +83,10 @@ export function ShoppingCart() {
   const [carritoId, setCarritoId] = useState<number | null>(null);
   const [updateProductLine] = useMutation(UPDATE_PRODUCT_LINE);
   const [deleteProductLine] = useMutation(DELETE_PRODUCT_LINE);
+  const [vaciarCarrito]=useMutation(VACIAL_CARROTO);
   const { loading, error, data, startPolling, stopPolling } = useQuery(GET_PRODUCTS_IN_CART, {
-    variables: { cartId: carritoId },
+    variables: { input: { id: carritoId } },
+    skip: !carritoId,
     pollInterval: 1,
   });
 
@@ -77,14 +96,14 @@ useEffect(() => {
       setCarritoId(parseInt(storedCartId));
     }
   }, []);
-
+  console.log("idcart",carritoId)
   useEffect(() => {
-    if (data) {
-      const productsFromDB = data.findAllLineProductsInCart.map((item: { id: any; product: { name: any; }; subprice: any; cant: any; }) => ({
+    if (data  && data.getLineaProductoByIdCarrito && data.getLineaProductoByIdCarrito.lp) {
+      const productsFromDB = data.getLineaProductoByIdCarrito.lp.map((item: { id: any; product: { name: any; }; subprice: any; cant: any; })  => ({
         id: item.id,
-        name: item.product.name,
+        name: item.product?.name,
         price: item.subprice,
-        quantity: item.cant,
+        quantity: item.cant
       }));
       setProducts(productsFromDB);
     }
@@ -123,10 +142,31 @@ useEffect(() => {
         return products.reduce((acc, product) => acc + product.price, 0);
     };
     
-  const clearAll = () => {
-    clearCart();
-    setProducts([]);
-  }
+    const clearAll = async () => {
+      if (carritoId === null) {
+        console.error('No cart ID available for clearing');
+        return;
+      }
+    
+      try {
+        const response = await vaciarCarrito({ 
+          variables: { 
+            input: { id: carritoId }
+          } 
+        });
+    
+        if (response.data.vaciarCarrito && response.data.vaciarCarrito.status === 'Success') {
+          console.log('Carrito vaciado exitosamente');
+          clearCart();
+          setProducts([]);
+        } else {
+          console.error('Error al vaciar el carrito:', response.data.vaciarCarrito.error);
+        }
+      } catch (error) {
+        console.error('Error al vaciar el carrito:', error);
+      }
+    };
+    
   const handleCheckoutClick = () => {
     handleCheckout(products);
     setProducts([]);
@@ -138,19 +178,20 @@ useEffect(() => {
     setProducts(getCart());  
 }
 
+
 return (
     <div className="w-full max-w-3xl p-10 bg-white bg-opacity-90 rounded-lg shadow-md overflow-y-auto">
       <h2 className="text-2xl font-bold text-black mb-4">Carrito de compra</h2>
       <ul className="space-y-4">
-          {products.length ? (
-              products.map(product => (
-                  <li key={product.id} className="flex items-center border p-2 rounded">
+          {data?.getLineaProductoByIdCarrito?.lp.length ? (
+              data.getLineaProductoByIdCarrito.lp.map((item: ProductInCart, index: any) => (
+                  <li key={`${item.producto.id}_${index}`} className="flex items-center border p-2 rounded">
                       <div className="flex-grow">
-                          <h3 className="text-lg text-black">{product.name}</h3>
-                          <p className='text-red-500'>Precio: ${Math.floor(product.price)}</p>
-                          <p className="text-black">Cantidad: {product.quantity}</p>
+                          <h3 className="text-lg text-black">{item.producto.name}</h3>
+                          <p className='text-red-500'>Precio: ${Math.floor(item.subprice)}</p>
+                          <p className="text-black">Cantidad: {item.cant}</p>
                       </div>
-                      <button onClick={() => removeProduct(product.id)} className="bg-transparent p-2">
+                      <button onClick={() => removeProduct(item.producto.id.toString())}  className="bg-transparent p-2">
                           X {/* Esto representa el ícono de "cerrar". */}
                       </button>
                   </li>
@@ -159,14 +200,13 @@ return (
               <p className="cart-empty">El carrito está vacío</p>
           )}
       </ul>
-      {products.length > 0 && (
+      {data?.getLineaProductoByIdCarrito.lp.length  > 0 && (
           <div className="mt-4 flex justify-between items-center">
               <span className="text-xl text-black">Subtotal:</span>
               <span className="text-xl text-black">${Math.floor(getTotal(products))}</span>
-
-              {/* <button onClick={clearAll} className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+              <button onClick={clearAll} className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">
                   Vaciar Carrito
-              </button> */}
+              </button>
               <button className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-1 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">
                <Link href = "checkout" passHref>
                  Ir a pagar

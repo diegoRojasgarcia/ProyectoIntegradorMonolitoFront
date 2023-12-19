@@ -5,7 +5,7 @@ import { gql, useLazyQuery, useMutation, useQuery,  InMemoryCache, makeVar  } fr
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { CreateLineProduct, Auth, Product } from "@/types";
+import { CrearLineaProducto, Auth, Product } from "@/types";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import ButtonCars from  "@/components/ButtonCars";
@@ -14,16 +14,17 @@ import { ModalLineProduct } from "@/components/ModalLineProduct";
 export const cartItemsVar = makeVar([]);
 
 const Product_QUERY = gql`
-  query GetProductos {
+  query {
     getProductos {
-      status
-      error
       data {
         id
         name
         description
         price
         image
+        ingredients {
+          name
+        }
       }
     }
   }
@@ -42,7 +43,7 @@ export default function Home() {
   const router = useRouter();
   const [favoriteBurgers, setFavoriteBurgers] = useState<Product[]>([]);
 
-  const crearLineProduct = async (dataLineProduct: CreateLineProduct) => {
+  const crearLineProduct = async (dataLineProduct: CrearLineaProducto) => {
     const cantidad = dataLineProduct.cantidad;
     console.log(
       "se ha creado la line product, cantidad del producto",
@@ -64,11 +65,12 @@ export default function Home() {
   };
  
 
-useEffect(() => {
-  if (data && data.products && data.products.length >= 3) {
-      setFavoriteBurgers(data.products.slice(2, 5));
-  }
-}, [data]);
+  useEffect(() => {
+    if (data && data.getProductos && data.getProductos.data && data.getProductos.data.length >= 3) {
+        setFavoriteBurgers(data.getProductos.data.slice(6, 9));
+    }
+  }, [data]);
+  
 
 return (
   <>
@@ -107,7 +109,7 @@ return (
         {/* Sección de Todas las Hamburguesas */}
         <h2 className="text-2xl font-bold mb-4 text-center bg-gray-800 text-white py-2 rounded">Todas las Hamburguesas y bebestibles</h2>
         <div className="grid grid-cols-1 gap-1 md:grid-cols-1 lg:grid-cols-3 lg:gap-7">
-          {data && data.products.map((product: Product) => (
+          {data && data.getProductos.data.map((product: Product) => (
             <div
               key={product.id}
               className="rounded-lg bg-slate-100 xl:aspect-h-8 xl:aspect-w-2 h-84 hover:bg-cyan-50 cursor-pointer"

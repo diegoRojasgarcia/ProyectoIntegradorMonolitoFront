@@ -3,6 +3,7 @@
 
 import React from 'react';
 import NavBar from "@/components/NavBar";
+import Footer from '@/components/Footer';
 
 const AbutUs: React.FC = () => {
   return (
@@ -43,7 +44,9 @@ const AbutUs: React.FC = () => {
                   <p className="text-gray-700">Burger Delight nació en junio del 2023 de la mano de un grupo de informáticos apasionados por la tecnología y, sorprendentemente, por la cocina. Gonzalo Honores, el líder del grupo, decidió unir fuerzas con sus colegas para fusionar la precisión de la programación con el arte de cocinar. Lo que comenzó como un pequeño proyecto en los fines de semana, rápidamente se transformó en una pasión. Con el respaldo de una familia dedicada y un equipo de trabajo excepcional, hemos logrado convertirnos en un punto de referencia para todos los amantes de las hamburguesas en Coquimbo.</p>
               </section>
           </div>
-      </div></>
+      </div>
+      <Footer />
+    </>    
   );
 };
 

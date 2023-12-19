@@ -13,18 +13,13 @@ type RegisterFormData = Auth & {
 };
 
 const CREATE_USER = gql`
-mutation RegisterUser($name: String!, $email: String!, $password: String!) {
-  register(registerUserInput: {
-    name: $name,
-    email: $email,
-    password: $password
-  }) {
-    status
-    error
-    message
+  mutation register($input: RegisterRequestDto!) {
+    register(registerUserInput: $input) { 
+      status,
+      error,
+      message
+    }
   }
-}
-
 `;
 export default function Home() {
   const router = useRouter();

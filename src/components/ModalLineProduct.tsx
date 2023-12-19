@@ -1,35 +1,43 @@
 
-import { CreateLineProduct } from "@/types";
+import { CrearLineaProducto, ProductInCart } from "@/types";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import ShoppingCart, { addToCart } from './ShoppingCarts';
 import { gql, useMutation } from "@apollo/client";
 
 
+// const CREAR_LINEA_PRODUCTO = gql`
+//   mutation crearLineaProducto($input: CreateLineaproductoInput!) {
+//     createLineProduct(createLineaproductoInput: $input) {
+//       id
+//       product {
+//         name
+//         price
+//       }
+//       cant
+//       subprice
+//     }
+//   }
+//   `;
 const CREAR_LINEA_PRODUCTO = gql`
-  mutation crearLineaProducto($input: CreateLineaproductoInput!) {
-    createLineProduct(createLineaproductoInput: $input) {
-      id
-      product {
-        name
-        price
-      }
-      cant
-      subprice
+  mutation CrearLineaProducto($input: CreateLineaProductoInput!) {
+    crearLineaProducto(createLineaProductoInput: $input) {
+      status
+      error
+      message
     }
   }
-  `;
+`;
 
 export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }: any) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreateLineProduct>();
+  } = useForm<CrearLineaProducto>();
   const [message, setMessage] = useState('');
   console.log(product)
   const [crearLineaDeProducto, { data, loading, error }] = useMutation(CREAR_LINEA_PRODUCTO);
-  const [carritoIdStorage, setcarritodStorage] = React.useState('');
   const [carritoId, setCarritoId] = useState<number | null>(null);
   useEffect(() => {
     const storedCartId = localStorage.getItem('cartId');
@@ -39,12 +47,21 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
   }, []);
 
   const onSubmit = handleSubmit((data) => {
-    const productToAdd = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: parseInt(data.cantidad as unknown as string),
-        image:product.image
+    const productToAdd: ProductInCart = {
+      producto: {
+        id: product.id, // Asumiendo que product.id es de tipo number
+        name: product.name, // Asumiendo que product.name es de tipo string
+        description: product.description, // Necesitas asegurarte de que 'product' tenga una descripción
+        price: product.price.toString(), // La interfaz Product espera un string para 'price'
+        image: product.image, // Asumiendo que product.image es de tipo string
+      },
+      id: product.id.toString(), // Debe ser un string según la interfaz ProductInCart
+      name: product.name,
+      price: product.subprice, // Asumiendo que 'subprice' es el precio unitario del producto
+      quantity: parseInt(data.cantidad as unknown as string),
+      image: "",
+      subprice: 0,
+      cant: 0
     };
      if (!carritoId) {
       console.error('Falta el ID del carrito');
@@ -56,15 +73,20 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
       crearLineaDeProducto({
         variables: {
           input: {
-            idCarrito: carritoId,
-            idProduct: product.id,
-            cant: parseInt(data.cantidad as unknown as string)
+            idcarrito: parseFloat(carritoId.toString()),
+            idProducto: parseFloat(product.id.toString()),
+            cant: parseInt(data.cantidad as unknown as string),
+            subprice: parseFloat((product.price * data.cantidad).toFixed(2))
           }
         }
       }).then(response => {
-        // Handle response if needed
-        crearLineProduct(data);
-        closeModalCreate(false);
+        if (response.data.crearLineaProducto.status === 200) {
+          setMessage(response.data.crearLineaProducto.message);
+          crearLineProduct(data);
+          closeModalCreate(false);
+        } else {
+          setMessage(`Error: ${response.data.crearLineaProducto.error}`);
+        }
       }).catch(error => {
         console.error(error);
         setMessage('Ocurrió un error al añadir el producto a la base de datos.');

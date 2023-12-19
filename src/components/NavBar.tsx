@@ -1,6 +1,5 @@
 import React, { useEffect,useState } from 'react';
 import Link from 'next/link';
-import ShoppingCarts from './ShoppingCarts';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -45,16 +44,13 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
-    const userEmail = localStorage.getItem("emailUser");
-    if (userEmail) {
-      setuserEmailStorage(userEmail);
-    }
     const userId = localStorage.getItem("userId");
     if (userId) {
       setUserIdStorage(userId);
     }
   }, []); 
-
+  
+  console.log(userIdStorage);
 return (
   <Disclosure as="nav" className="hover:bg-gray-700">
       {({ open }) => (
@@ -119,7 +115,7 @@ return (
             </Link>
           </div>
         </div>
-        {userEmailStorage ? (
+        {userIdStorage ? (
         <Menu as="div" className="relative inline-block text-left">
         <div>
           <Menu.Button
@@ -146,7 +142,8 @@ return (
         >
             <Menu.Items
               static
-              className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+
             >
               <div className="px-1 py-1">
                 <Menu.Item>

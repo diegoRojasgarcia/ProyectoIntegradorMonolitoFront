@@ -6,19 +6,24 @@ import { useEffect, useState } from "react";
 import { ProductInCart } from "@/types";
 
 export const GET_PRODUCTS_IN_CART = gql`
-  query GetLineProductsInCart($cartId: Int!) {
-    findAllLineProductsInCart(cartId: $cartId) {
-      id
-      product {
-        id
-        name
-        image
-        price
-      }
-      cant
-      subprice
+    query LineaProductoByIdCarrito($input: getProductoByIdCarritoInput!) {
+        getLineaProductoByIdCarrito(getLineaProductoByIdCarritoInput: $input) {
+        status
+        error
+        lp {
+            id
+            producto {
+            id
+            name
+            description
+            image
+            }
+            cant
+            subprice
+            idcarrito
+        }
+        }
     }
-  }
 `;
   export function getCart(): ProductInCart[] {
     return cart;
@@ -29,7 +34,8 @@ export const GET_PRODUCTS_IN_CART = gql`
     const [products, setProducts] = useState<ProductInCart[]>(getCart());
     const [carritoId, setCarritoId] = useState<number | null>(null);
     const { loading, error, data, startPolling, stopPolling } = useQuery(GET_PRODUCTS_IN_CART, {
-        variables: { cartId: carritoId },
+        variables: { input: { id: carritoId } },
+        skip: !carritoId,
         pollInterval: 1,
       });
       useEffect(() => {
@@ -39,19 +45,17 @@ export const GET_PRODUCTS_IN_CART = gql`
         }
       }, []);
       useEffect(() => {
-        if (data) {
-          const productsFromDB = data.findAllLineProductsInCart.map((item: { id: any; product: {
-              image: any; name: any; 
-}; subprice: any; cant: any; }) => ({
-            id: item.id,
-            name: item.product.name,
-            image: item.product.image,
-            price: item.subprice,
-            quantity: item.cant,
+        console.log("consola",carritoId)
+        if (data  && data.getLineaProductoByIdCarrito && data.getLineaProductoByIdCarrito.lp) {
+            const productsFromDB = data.getLineaProductoByIdCarrito.lp.map((item: { id: any; product: { name: any; image: any; }; subprice: any; cant: any; })  => ({
+                id: item.id,
+                name: item.product?.name,
+                price: item.subprice,
+                quantity: item.cant,
           }));
           setProducts(productsFromDB);
         }
-      }, [data]);
+      }, [carritoId, data]);
     const getTotalParcial = (products: any[]) => {
         return products.reduce((acc, product) => acc + product.price, 0);
     };
@@ -59,13 +63,10 @@ export const GET_PRODUCTS_IN_CART = gql`
         return products.reduce((acc, product) => acc + product.price, 2500);
     };
 return (
-        <><NavBar /><div className="bg-white">
-        {/* Background color split screen for large screens */}
-        <div className="hidden lg:block fixed top-[50%] left-0 w-1/2 h-10 bg-white" aria-hidden="true"></div>
-        <div className="hidden lg:block fixed top-20 h-[calc(90%-10rem)] bottom-16 right-0 w-1/2 bg-gray-800" aria-hidden="true"></div>
-
-
-        <main className="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:px-8 lg:grid-cols-2  margin-top: 60px">
+    <><NavBar /><><>
+        <div className="hidden lg:block fixed top-[50%] left-0 w-1/2 h-10 bg-white bg-white mt-50 bg-white margin-top-900px mt-20" aria-hidden="true"></div>
+        <div className="hidden lg:block fixed top-20 h-[calc(100%-10rem)] bottom-56 right-0 w-1/2 bg-gray-800 " aria-hidden="true"></div>
+        <main className="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:px-8 lg:grid-cols-2  margin-top: 100px mt-10">
             <section
                 aria-labelledby="summary-heading"
                 className="bg-indigo-900 text-indigo-300 pt-6 pb-12 md:px-10 lg:max-w-lg lg:w-full lg:mx-auto lg:px-0 lg:pt-0 lg:pb-24 lg:bg-transparent lg:row-start-1 lg:col-start-2"
@@ -80,20 +81,19 @@ return (
                     </dl>
 
                     <ul role="list" className="text-sm font-medium divide-y divide-white divide-opacity-10">
-                        {products.map((product) => (
-                            <li key={product.id} className="flex items-start py-6 space-x-4">
-                                <img
-                                    src={product.name}
-                                    className="flex-none w-20 h-20 rounded-md object-center object-cover"
-                                    alt={product.image} />
-                                <div className="flex-auto space-y-1">
-                                    <h3 className="text-white">{product.name}</h3>
-                                    {/* <p>{product.color}</p>
-<p>{product.size}</p> */}
-                                </div>
-                                <p className="flex-none text-base font-medium text-white">{product.price}</p>
-                            </li>
-                        ))}
+                        {data?.getLineaProductoByIdCarrito?.lp.length ? (
+                            data.getLineaProductoByIdCarrito.lp.map((item: ProductInCart, index: any) => (
+                                <li key={`${item.producto.id}_${index}`} className="flex items-start py-6 space-x-4">
+                                    <div className="flex-auto space-y-1">
+                                        <h3 className="text-white">{item.producto.name}</h3>
+                                        <h3 className="text-white">Cantidad: {item.cant}</h3>
+                                    </div>
+                                    <p className="flex-nsone text-base font-medium text-white">${item.subprice}</p>
+                                </li>
+                            ))
+                        ) : (
+                            <p className="cart-empty">El carrito está vacío</p>
+                        )}
                     </ul>
 
                     <dl className="text-sm font-medium space-y-6 border-t border-white border-opacity-10 pt-6">
@@ -141,56 +141,6 @@ return (
                                         name="email-address"
                                         autoComplete="email"
                                         className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-10">
-                            <h3 id="payment-heading" className="text-lg font-medium text-gray-900">
-                                Detalles del pago
-                            </h3>
-
-                            <div className="mt-6 grid grid-cols-3 sm:grid-cols-4 gap-y-6 gap-x-4">
-                                <div className="col-span-3 sm:col-span-4">
-                                    <label htmlFor="card-number" className="block text-sm font-medium text-gray-700">
-                                        Número de tarjeta
-                                    </label>
-                                    <div className="mt-1">
-                                        <input
-                                            type="text"
-                                            id="card-number"
-                                            name="card-number"
-                                            autoComplete="cc-number"
-                                            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                    </div>
-                                </div>
-
-                                <div className="col-span-2 sm:col-span-3">
-                                    <label htmlFor="expiration-date" className="block text-sm font-medium text-gray-700">
-                                        Fecha de vencimiento (MM/AA)
-                                    </label>
-                                    <div className="mt-1">
-                                        <input
-                                            type="text"
-                                            name="expiration-date"
-                                            id="expiration-date"
-                                            autoComplete="cc-exp"
-                                            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="cvc" className="block text-sm font-medium text-gray-700">
-                                        CVC
-                                    </label>
-                                    <div className="mt-1">
-                                        <input
-                                            type="text"
-                                            name="cvc"
-                                            id="cvc"
-                                            autoComplete="csc"
-                                            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +220,6 @@ return (
                 </form>
             </section>
         </main>
-    </div></>
-
-    )
+    </><Footer /></></>
+    ) 
   }
