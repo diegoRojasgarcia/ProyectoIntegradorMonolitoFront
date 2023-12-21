@@ -1,9 +1,10 @@
 "use client";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { ProductInCart } from "@/types";
+import { useRouter } from "next/navigation";
 
 export const GET_PRODUCTS_IN_CART = gql`
     query LineaProductoByIdCarrito($input: getProductoByIdCarritoInput!) {
@@ -25,19 +26,63 @@ export const GET_PRODUCTS_IN_CART = gql`
         }
     }
 `;
+
+export const CREATE_PAGO = gql`
+    mutation createPago($input: CreatePagoInput!) {
+        createPago(createPagoInput: $input) {
+        status,     
+        error,     
+        token,     
+        url   
+        } 
+    }
+`;
+
+const USER_QUERY = gql`
+  query findUser($input: FindUserRequestDto!) {
+    findUserById(findUserById: $input) {
+      status
+      error
+      user {
+        name
+        email
+      }
+    }
+  }
+`;
   export function getCart(): ProductInCart[] {
     return cart;
     }
     let cart: ProductInCart[] = [];
 
-  export default function Example() {
+  export default function Chackout() {
+    const router = useRouter();
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+    const [userId, setUserId] = useState<number | null>(null);
     const [products, setProducts] = useState<ProductInCart[]>(getCart());
     const [carritoId, setCarritoId] = useState<number | null>(null);
+    const [createPago, { data: pagoData, loading: pagoLoading, error: pagoError }] = useMutation(CREATE_PAGO);
+    const [loadUser, setLoadUser] = useState(false);
     const { loading, error, data, startPolling, stopPolling } = useQuery(GET_PRODUCTS_IN_CART, {
         variables: { input: { id: carritoId } },
         skip: !carritoId,
         pollInterval: 1,
       });
+
+      useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+            setUserId(parseInt(userId, 10));
+            setLoadUser(true); 
+            console.log("UserID set from localStorage:", userId);
+        }
+      }, []);
+      
+      const { loading: userLoading, error: userError, data: userData } = useQuery(USER_QUERY, {
+        variables: { input: { id : userId } },
+        skip: !loadUser,
+      });
+      
       useEffect(() => {
         const storedCartId = localStorage.getItem('cartId');
         if (storedCartId) {
@@ -62,6 +107,45 @@ export const GET_PRODUCTS_IN_CART = gql`
     const getTotal = (products: any[]) => {
         return products.reduce((acc, product) => acc + product.price, 2500);
     };
+
+    const handlePayment = async () => {
+        setIsProcessingPayment(true); 
+        try {
+            const total = getTotal(products);
+            console.log('Total a pagar:', total);
+
+            const response = await createPago({
+                variables: {
+                    input: {
+                        amount: total
+                    }
+                }
+            });
+
+            const paymentData = response.data.createPago;
+            console.log('Total a pagar:', paymentData);
+            if (paymentData && paymentData.token) {
+                console.log('Token de pago:', paymentData.token);
+                localStorage.setItem('paymentToken', paymentData.token);
+                const paymentUrl = `https://webpay3gint.transbank.cl/webpayserver/initTransaction?token_ws=${paymentData.token}`;
+                router.push(paymentUrl);
+            } else {
+                console.error('Error al crear el pago:', paymentData.error);
+            }
+        } catch (error) {
+            console.error('Error en el proceso de pago', error);
+   
+        }
+        setIsProcessingPayment(false); 
+    };
+    
+    if (!userData || !userData.findUserById) return <p></p>;
+        
+    const user = userData.findUserById.user; 
+
+    if (userLoading) return <p>Loading...</p>;
+    if (userError) return <p>An error occurred: {userError.message}</p>;
+      
 return (
     <><NavBar /><><>
         <div className="hidden lg:block fixed top-[50%] left-0 w-1/2 h-10 bg-white bg-white mt-50 bg-white margin-top-900px mt-20" aria-hidden="true"></div>
@@ -129,18 +213,20 @@ return (
                             <h3 id="contact-info-heading" className="text-lg font-medium text-gray-900">
                                 Información del contacto
                             </h3>
-
+                            <div className="mt-6">
+                                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
+                                    Nombre usuario
+                                </label>
+                                <div className="mt-1">
+                                <input type="text" value={user.name} readOnly />
+                                </div>
+                            </div>
                             <div className="mt-6">
                                 <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
                                     Dirección de correo electrónico
                                 </label>
                                 <div className="mt-1">
-                                    <input
-                                        type="email"
-                                        id="email-address"
-                                        name="email-address"
-                                        autoComplete="email"
-                                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                <input type="email" value={user.email} readOnly />
                                 </div>
                             </div>
                         </div>
@@ -209,11 +295,11 @@ return (
                             </div>
                         </div>
                         <div className="mt-10 flex justify-end pt-6 border-t border-gray-200">
-                            <button
-                                type="submit"
-                                className="bg-gray-800  border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                            <button onClick={handlePayment} className="bg-gray-800  border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                            disabled={isProcessingPayment} 
                             >
-                                Pagar ahora
+                                {isProcessingPayment ? 'Procesando...' : 'Pagar ahora'} 
+
                             </button>
                         </div>
                     </div>
@@ -223,3 +309,4 @@ return (
     </><Footer /></></>
     ) 
   }
+

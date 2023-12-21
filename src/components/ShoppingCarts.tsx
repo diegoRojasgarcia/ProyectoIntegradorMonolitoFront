@@ -14,19 +14,29 @@ export const UPDATE_PRODUCT_LINE = gql`
     }
 `;
 
-export const DELETE_PRODUCT_LINE = gql`
-    mutation DeleteProductLine($id: Float!) {
-        deleteLineProduct(id: $id)
+// export const DELETE_PRODUCT_LINE = gql`
+//     mutation DeleteProductLine($id: Float!) {
+//         deleteLineProduct(id: $id)
+//     }
+// `;
+
+export const VACIAL_CARROTO = gql`
+  mutation vaciarCarrito($input: vaciarCarritoRequest!) {
+      vaciarCarrito(vaciarCarritoInput: $input) {
+        status
+        error
+        Empty
+      }
     }
 `;
 
-export const VACIAL_CARROTO = gql`
-mutation vaciarCarrito($input: vaciarCarritoRequest!) {
-    vaciarCarrito(vaciarCarritoInput: $input) {
-      status
-      error
-      Empty
-    }
+export const DELETE_PRODUCT_LINE = gql`
+  mutation removeLineaProducto($input: deleteLineaProductoRequest!) {
+    removeLineaProducto(lineaProductoIdInput: $input) {    
+      status,    
+      error,
+      deleted   
+    } 
   }
 `;
 
@@ -82,7 +92,8 @@ export function ShoppingCart() {
   const [products, setProducts] = useState<ProductInCart[]>(getCart());
   const [carritoId, setCarritoId] = useState<number | null>(null);
   const [updateProductLine] = useMutation(UPDATE_PRODUCT_LINE);
-  const [deleteProductLine] = useMutation(DELETE_PRODUCT_LINE);
+  const [removeLineaProducto] = useMutation(DELETE_PRODUCT_LINE);
+
   const [vaciarCarrito]=useMutation(VACIAL_CARROTO);
   const { loading, error, data, startPolling, stopPolling } = useQuery(GET_PRODUCTS_IN_CART, {
     variables: { input: { id: carritoId } },
@@ -122,21 +133,27 @@ useEffect(() => {
     const removeProduct = async (id: string) => {
         console.log(id);
         try {
-          const productId = parseFloat(id);
-          console.log(productId);
-          const { data } = await deleteProductLine({ variables: { id: productId } }); 
-          if (data.deleteLineProduct) {
-            console.log('Producto eliminado con éxito');
-            setProducts(prevProducts => prevProducts.filter(product => parseFloat(product.id) !== productId));
-          } else {
-            console.error('No se pudo eliminar el producto, el servidor devolvió false');
-          }
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            console.error('Error al eliminar el producto:', error.message);
-          }
+            const productId = parseFloat(id);
+            console.log("producto id", productId);
+            const { data } = await removeLineaProducto({ 
+                variables: { 
+                    input: { id: productId } 
+                } 
+            });
+
+            if (data.removeLineaProducto && data.removeLineaProducto.deleted) {
+                console.log('Producto eliminado con éxito');
+                setProducts(prevProducts => prevProducts.filter(product => parseFloat(product.id) !== productId));
+            } else {
+                console.error('No se pudo eliminar el producto, el servidor devolvió false');
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error('Error al eliminar el producto:', error.message);
+            }
         }
-      };
+    };
+
       
     const getTotal = (products: any[]) => {
         return products.reduce((acc, product) => acc + product.price, 0);
@@ -191,7 +208,7 @@ return (
                           <p className='text-red-500'>Precio: ${Math.floor(item.subprice)}</p>
                           <p className="text-black">Cantidad: {item.cant}</p>
                       </div>
-                      <button onClick={() => removeProduct(item.producto.id.toString())}  className="bg-transparent p-2">
+                      <button onClick={() => removeProduct(item.id.toString())}  className="bg-transparent p-2">
                           X {/* Esto representa el ícono de "cerrar". */}
                       </button>
                   </li>

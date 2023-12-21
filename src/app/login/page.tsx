@@ -44,6 +44,7 @@ export default function Home() {
     handleSubmit,
     formState: { errors },
   } = useForm<Auth>();
+  
   const [login, { loading, error }] = useMutation(LOGIN_USER, {
     onCompleted: async (data) => {
       console.log("Login completado:", data);
@@ -52,7 +53,7 @@ export default function Home() {
       if (data.login && data.login.idUser) {
         const userId = data.login.idUser;
         localStorage.setItem("userId", userId.toString()); 
-  
+        localStorage.setItem('userId', userId);
         try {
           console.log("Intentando crear carrito para el usuario:", userId);
           // Ejecutar la mutación para crear el carrito

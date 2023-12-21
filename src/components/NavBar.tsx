@@ -21,7 +21,7 @@ const BurgerSVG: React.FC = () => (
 );
 
 const Navbar: React.FC = () => {
-  const [isCartOpen, setIsCartOpen] = useState(false);
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [userEmailStorage, setuserEmailStorage] = React.useState("");
   const [userIdStorage, setUserIdStorage] = React.useState('');

@@ -45,6 +45,7 @@ const ViewProfile = () => {
           setLoadUser(true);
         }
       }
+      console.log("xd",idParam)
     }
   }, []);
 

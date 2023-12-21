@@ -2,23 +2,10 @@
 import { CrearLineaProducto, ProductInCart } from "@/types";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import ShoppingCart, { addToCart } from './ShoppingCarts';
+import { addToCart } from './ShoppingCarts';
 import { gql, useMutation } from "@apollo/client";
 
 
-// const CREAR_LINEA_PRODUCTO = gql`
-//   mutation crearLineaProducto($input: CreateLineaproductoInput!) {
-//     createLineProduct(createLineaproductoInput: $input) {
-//       id
-//       product {
-//         name
-//         price
-//       }
-//       cant
-//       subprice
-//     }
-//   }
-//   `;
 const CREAR_LINEA_PRODUCTO = gql`
   mutation CrearLineaProducto($input: CreateLineaProductoInput!) {
     crearLineaProducto(createLineaProductoInput: $input) {
@@ -49,15 +36,15 @@ export function ModalLineProduct({ closeModalCreate, crearLineProduct, product }
   const onSubmit = handleSubmit((data) => {
     const productToAdd: ProductInCart = {
       producto: {
-        id: product.id, // Asumiendo que product.id es de tipo number
-        name: product.name, // Asumiendo que product.name es de tipo string
-        description: product.description, // Necesitas asegurarte de que 'product' tenga una descripción
-        price: product.price.toString(), // La interfaz Product espera un string para 'price'
-        image: product.image, // Asumiendo que product.image es de tipo string
+        id: product.id, 
+        name: product.name, 
+        description: product.description, 
+        price: product.price.toString(), 
+        image: product.image, 
       },
-      id: product.id.toString(), // Debe ser un string según la interfaz ProductInCart
+      id: product.id.toString(), 
       name: product.name,
-      price: product.subprice, // Asumiendo que 'subprice' es el precio unitario del producto
+      price: product.subprice, 
       quantity: parseInt(data.cantidad as unknown as string),
       image: "",
       subprice: 0,
